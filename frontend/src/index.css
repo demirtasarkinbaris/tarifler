@@ -1,0 +1,445 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 25%, #e0f2f1 50%, #dcfce7 75%, #d4edda 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(21, 128, 61, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(74, 222, 128, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Professional Recipe Card */
+.recipe-card {
+  @apply bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer relative z-10;
+  border: 2px solid rgba(34, 197, 94, 0.12);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.08);
+}
+
+.recipe-card:hover .recipe-card-image::after {
+  opacity: 1;
+}
+
+.recipe-card-image {
+  @apply w-full h-56 object-cover relative overflow-hidden;
+}
+
+.recipe-card-image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.recipe-card-body {
+  @apply p-5;
+}
+
+.recipe-card-title {
+  @apply text-base font-bold mb-2 line-clamp-3 transition-colors;
+  color: #166534;
+}
+
+.recipe-card:hover .recipe-card-title {
+  color: #15a34a;
+}
+
+.recipe-card-category {
+  @apply text-xs text-white font-bold px-3 py-1 rounded-full inline-block mb-3;
+  color: #ffffff
+}
+
+.recipe-card-description {
+  @apply text-sm text-gray-600 line-clamp-2 mb-3;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+}
+
+.btn-secondary {
+  @apply text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.btn-danger {
+  @apply bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer;
+}
+
+.btn-outline {
+  @apply border-2 border-primary text-primary px-6 py-2 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all duration-300;
+}
+
+/* Container */
+.container-custom {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2;
+}
+
+/* Section Title */
+.section-title {
+  @apply text-4xl md:text-5xl font-black mb-2 relative;
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-title::after {
+  @apply absolute bottom-0 left-0 w-24 h-1.5 bg-gradient-to-r from-green-600 via-green-500 to-emerald-400 rounded-full;
+}
+
+.section-title-container {
+  @apply mb-12 relative z-10;
+}
+
+/* Professional Typography */
+.text-hero {
+  @apply text-5xl md:text-6xl font-black drop-shadow-xl;
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-subtitle {
+  @apply text-xl drop-shadow-lg;
+  color: rgba(255, 255, 255, 0.97);
+}
+
+/* Form Styling */
+.form-input {
+  @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white;
+}
+
+.form-textarea {
+  @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white;
+}
+
+.form-select {
+  @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white;
+}
+
+.form-label {
+  @apply block text-sm font-semibold text-gray-700 mb-2;
+}
+
+/* Professional Badge */
+.badge {
+  @apply inline-block px-4 py-1 rounded-full text-sm font-semibold;
+}
+
+.badge-primary {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-secondary {
+  @apply bg-emerald-100 text-emerald-800;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+/* Loading Animation */
+@keyframes pulse-smooth {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(34, 197, 94, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+  }
+}
+
+.animate-pulse-smooth {
+  animation: pulse-smooth 2s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.6s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-in;
+}
+
+.animate-slide-left {
+  animation: slide-left 0.6s ease-out;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-float-left {
+  animation: float-left 5s ease-in-out infinite;
+}
+
+.animate-float-right {
+  animation: float-right 5s ease-in-out infinite;
+}
+
+/* Professional Card */
+.card {
+  @apply bg-white rounded-xl shadow-lg p-6 border;
+  border-color: rgba(34, 197, 94, 0.2);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.08);
+}
+
+.card-header {
+  @apply border-b-2 pb-4 mb-4;
+  border-color: rgba(34, 197, 94, 0.15);
+}
+
+.card-title {
+  @apply text-2xl font-bold;
+  color: #166534;
+}
+
+/* Hero Section */
+.hero-section {
+  @apply rounded-3xl p-12 md:p-20 text-white relative overflow-hidden shadow-2xl;
+  background: linear-gradient(135deg, #15803d 0%, #16a34a 25%, #059669 50%, #047857 75%, #065f46 100%);
+  position: relative;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 1;
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero-section::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 1;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes float-left {
+  0%, 100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(-30px);
+  }
+}
+
+@keyframes float-right {
+  0%, 100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(30px);
+  }
+}
+
+.hero-content {
+  @apply relative z-10;
+}
+
+/* Category Grid */
+.category-grid {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-6;
+}
+
+.category-card {
+  @apply rounded-2xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer text-center border-2 relative z-10;
+  background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.category-card:hover {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.category-icon {
+  @apply text-6xl mb-3 block;
+}
+
+.category-name {
+  @apply font-bold text-gray-800 text-base;
+}
+
+/* Ingredient List */
+.ingredient-item {
+  @apply flex items-start gap-3 p-3 mb-3 bg-green-50 rounded-lg hover:bg-green-100 transition-all duration-300 border-l-4;
+  border-color: #16a34a;
+}
+
+.ingredient-item p {
+  @apply text-gray-900;
+}
+
+.ingredient-check {
+  @apply flex-shrink-0 w-6 h-6 rounded-full text-white flex items-center justify-center font-bold text-sm mt-0.5;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+}
+
+/* Step Instructions */
+.instruction-step {
+  @apply mb-6 flex gap-4 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
+  border-left: 4px solid #16a34a;
+}
+
+.instruction-step .step-content {
+  @apply text-gray-900;
+}
+
+.step-number {
+  @apply flex-shrink-0 w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-sm;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.step-content {
+  @apply flex-1 text-gray-700 leading-relaxed;
+}
+
+/* Table Professional */
+.table-professional {
+  @apply w-full;
+}
+
+.table-professional thead {
+  @apply text-white;
+  background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+}
+
+.table-professional th {
+  @apply px-6 py-4 text-left text-sm font-semibold;
+}
+
+.table-professional td {
+  @apply px-6 py-4 border-b border-green-100;
+}
+
+.table-professional tr:hover {
+  @apply bg-green-50;
+}
+
+/* Modal/Dialog */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full mx-4;
+}
+
+/* Success/Error Messages */
+.alert {
+  @apply p-4 rounded-lg font-medium;
+}
+
+.alert-success {
+  @apply bg-green-100 text-green-800 border-l-4 border-green-500;
+}
+
+.alert-error {
+  @apply bg-red-100 text-red-800 border-l-4 border-red-500;
+}
+
+.alert-warning {
+  @apply bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500;
+}
+
+.alert-info {
+  @apply bg-blue-100 text-blue-800 border-l-4 border-blue-500;
+}
