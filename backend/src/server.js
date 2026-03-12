@@ -13,8 +13,15 @@ const prisma = new PrismaClient();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.CLIENT_URL
+].filter(Boolean); // undefined olanları temizler
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173'
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
 
 // Routes
