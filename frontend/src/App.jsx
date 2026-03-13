@@ -7,7 +7,7 @@ import RecipeDetail from './pages/RecipeDetail';
 import Category from './pages/Category';
 import Admin from './pages/Admin';
 import './index.css';
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
           </Routes>
         </main>
         <Footer />
-        <Analytics />
+        <Analytics framework="react" />
       </div>
     </Router>
   );
