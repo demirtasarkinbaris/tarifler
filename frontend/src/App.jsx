@@ -8,6 +8,7 @@ import Category from './pages/Category';
 import Admin from './pages/Admin';
 import './index.css';
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         </main>
         <Footer />
         <Analytics framework="react" />
+        <SpeedInsights framework="react" />
       </div>
     </Router>
   );
