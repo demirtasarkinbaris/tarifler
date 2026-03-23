@@ -4,5 +4,3 @@ dist/
 *.log
 .DS_Store
 .env
-SETUP.md
-STRUCTURE.md
