@@ -45,11 +45,17 @@ export default function Category() {
   }
 
   return (
-    <div>
+    <div className="pt-20">
       {/* Category Header */}
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+
       <div className="hero-section container-custom mb-6 rounded-3xl animate-slide-in" style={{animationDuration: '0.8s'}}>
         <div className="hero-content">
-          <h1 className="text-hero mb-3">
+          <h1 className="text-hero mb-3 font-semibold">
             {category.name}
           </h1>
           {category.description && (
@@ -70,7 +76,7 @@ export default function Category() {
             <p className="text-xl">Bu kategoride henüz tarif bulunmamaktadır.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 animate-fade-in" style={{animationDuration: '1s'}}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 animate-fade-in" style={{animationDuration: '1s'}}>
             {category.recipes?.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}

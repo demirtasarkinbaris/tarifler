@@ -122,6 +122,9 @@ export default function RecipeDetail() {
           <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.4%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22%3E%3C/circle%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
         </div>
 
+        <br />
+        <br />
+
         <div className="relative container-custom py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -129,13 +132,6 @@ export default function RecipeDetail() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <Link 
-                to="/" 
-                className="inline-flex items-center gap-3 text-white/80 hover:text-white transition-colors mb-8 group"
-              >
-                <ArrowLeft className="w-5 h-5 transform -translate-x-1 group-hover:translate-x-0 transition-transform" />
-                <span className="font-accent font-medium">Ana Sayfaya Dön</span>
-              </Link>
 
               <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30 mb-6">
                 {recipe.category?.name}
@@ -148,36 +144,6 @@ export default function RecipeDetail() {
               <p className="text-xl text-white/90 mb-8 font-body leading-relaxed">
                 {recipe.description}
               </p>
-
-              <div className="flex flex-wrap gap-6">
-                <div className="flex items-center gap-3 text-white/90">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Clock className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-accent font-medium text-white/70">Hazırlama</p>
-                    <p className="font-bold">30 dk</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-white/90">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-accent font-medium text-white/70">Kişi Sayısı</p>
-                    <p className="font-bold">4-6</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-white/90">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Star className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-accent font-medium text-white/70">Zorluk</p>
-                    <p className="font-bold">Orta</p>
-                  </div>
-                </div>
-              </div>
             </motion.div>
 
             <motion.div
