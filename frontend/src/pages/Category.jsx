@@ -47,7 +47,7 @@ export default function Category() {
   return (
     <div>
       {/* Category Header */}
-      <div className="hero-section container-custom mb-12 rounded-3xl animate-slide-in" style={{animationDuration: '0.8s'}}>
+      <div className="hero-section container-custom mb-6 rounded-3xl animate-slide-in" style={{animationDuration: '0.8s'}}>
         <div className="hero-content">
           <h1 className="text-hero mb-3">
             {category.name}

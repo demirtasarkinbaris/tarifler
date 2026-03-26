@@ -1,11 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { recipeService, categoryService } from '../services/api';
+import { 
+  Settings, 
+  BookOpen, 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  Save, 
+  X, 
+  ChefHat, 
+  Utensils, 
+  Star,
+  TrendingUp,
+  Package,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  Eye,
+  EyeOff
+} from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
+import { Badge } from '../components/ui/Badge';
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('recipes');
   const [recipes, setRecipes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   // Recipe Form State
@@ -38,7 +65,7 @@ export default function Admin() {
       const response = await recipeService.getAllRecipes();
       setRecipes(response.data);
     } catch (error) {
-      alert('Tarifler yüklenirken hata: ' + error.message);
+      console.error('Tarifler yüklenirken hata:', error);
     } finally {
       setLoading(false);
     }
@@ -49,11 +76,11 @@ export default function Admin() {
       const response = await categoryService.getAllCategories();
       setCategories(response.data);
     } catch (error) {
-      alert('Kategoriler yüklenirken hata: ' + error.message);
+      console.error('Kategoriler yüklenirken hata:', error);
     }
   };
 
-  // Parse ingredients from pasted text (format: "amount - name")
+  // Parse ingredients from pasted text
   const parseIngredients = (text) => {
     if (!text.trim()) return [];
     return text
@@ -61,7 +88,6 @@ export default function Admin() {
       .filter(line => line.trim())
       .map(line => {
         const trimmed = line.trim();
-        // Format: "125 g - margarin veya tereyağı"
         if (trimmed.includes('-')) {
           const [amount, name] = trimmed.split('-').map(s => s.trim());
           return {
@@ -69,7 +95,6 @@ export default function Admin() {
             name: name || ''
           };
         }
-        // Fallback: try to split by space for old format
         const parts = trimmed.split(/\s+/);
         if (parts.length > 1) {
           return {
@@ -79,7 +104,7 @@ export default function Admin() {
         }
         return { amount: '', name: trimmed };
       })
-      .filter(ing => ing.name.trim()); // Filter out empty entries
+      .filter(ing => ing.name.trim());
   };
 
   // Parse instructions and remove numbered prefixes
@@ -90,7 +115,6 @@ export default function Admin() {
       .filter(line => line.trim())
       .map(line => {
         const trimmed = line.trim();
-        // Remove "1. ", "2. " etc prefix
         return trimmed.replace(/^\d+\.\s*/, '');
       })
       .join('\n');
@@ -100,12 +124,10 @@ export default function Admin() {
   const handleRecipeSubmit = async (e) => {
     e.preventDefault();
     if (!recipeForm.title || !recipeForm.instructions || !recipeForm.youtubeUrl || !recipeForm.categoryId) {
-      alert('Lütfen tüm gerekli alanları doldurun');
       return;
     }
 
     try {
-      // Parse ingredients and instructions before sending
       const parsedIngredients = recipeForm.ingredients[0].name ? recipeForm.ingredients : [];
       const parsedInstructions = parseInstructions(recipeForm.instructions);
       
@@ -117,15 +139,18 @@ export default function Admin() {
 
       if (editingRecipeId) {
         await recipeService.updateRecipe(editingRecipeId, submitData);
-        alert('Tarif güncellendi');
+        setSuccessMessage('Tarif başarıyla güncellendi!');
       } else {
         await recipeService.createRecipe(submitData);
-        alert('Tarif oluşturuldu');
+        setSuccessMessage('Tarif başarıyla oluşturuldu!');
       }
+      
       resetRecipeForm();
       fetchRecipes();
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
-      alert('İşlem başarısız: ' + error.message);
+      console.error('İşlem başarısız:', error);
     }
   };
 
@@ -133,10 +158,11 @@ export default function Admin() {
     if (window.confirm('Bu tarifi silmek istediğinizden emin misiniz?')) {
       try {
         await recipeService.deleteRecipe(id);
-        alert('Tarif silindi');
+        setSuccessMessage('Tarif silindi!');
         fetchRecipes();
+        setTimeout(() => setSuccessMessage(''), 3000);
       } catch (error) {
-        alert('Silme işlemi başarısız: ' + error.message);
+        console.error('Silme işlemi başarısız:', error);
       }
     }
   };
@@ -188,22 +214,24 @@ export default function Admin() {
   const handleCategorySubmit = async (e) => {
     e.preventDefault();
     if (!categoryForm.name) {
-      alert('Kategori adı gereklidir');
       return;
     }
 
     try {
       if (editingCategoryId) {
         await categoryService.updateCategory(editingCategoryId, categoryForm);
-        alert('Kategori güncellendi');
+        setSuccessMessage('Kategori güncellendi!');
       } else {
         await categoryService.createCategory(categoryForm);
-        alert('Kategori oluşturuldu');
+        setSuccessMessage('Kategori oluşturuldu!');
       }
+      
       resetCategoryForm();
       fetchCategories();
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
-      alert('İşlem başarısız: ' + error.message);
+      console.error('İşlem başarısız:', error);
     }
   };
 
@@ -211,10 +239,11 @@ export default function Admin() {
     if (window.confirm('Bu kategoriyi silmek istediğinizden emin misiniz?')) {
       try {
         await categoryService.deleteCategory(id);
-        alert('Kategori silindi');
+        setSuccessMessage('Kategori silindi!');
         fetchCategories();
+        setTimeout(() => setSuccessMessage(''), 3000);
       } catch (error) {
-        alert('Silme işlemi başarısız: ' + error.message);
+        console.error('Silme işlemi başarısız:', error);
       }
     }
   };
@@ -232,413 +261,599 @@ export default function Admin() {
     }));
   };
 
+  const filteredRecipes = recipes.filter(recipe => 
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    recipe.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="bg-gray-50 min-h-screen">
-      {/* Admin Header */}
-      <div className="text-white py-8 shadow-xl" style={{background: 'linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%)'}}>
-        <div className="container-custom">
-          <h1 className="text-4xl md:text-5xl font-black mb-2">
-            ⚙️ Admin Paneli
-          </h1>
-          <p className="text-green-100 text-lg">
-            Tarifler ve kategorileri yönetin
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-luxury-50 via-white to-primary-50 pt-20">
+      {/* Header */}
+      <motion.section
+        className="relative overflow-hidden bg-gradient-to-br from-primary-800 via-primary-900 to-luxury-900 text-white"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.4%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22%3E%3C/circle%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />
         </div>
-      </div>
+        <br />
+        <br />
+        <div className="relative container-custom py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-center"
+          >
+            <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 mb-6">
+              <Settings className="w-6 h-6" />
+              <span className="font-accent font-semibold text-lg">Yönetim Paneli</span>
+            </div>
+
+            <h1 className="text-4xl md:text-6xl font-black font-display mb-6 leading-tight">
+              Profesyonel
+              <br />
+              <span className="bg-gradient-to-r from-primary-200 to-luxury-200 bg-clip-text text-transparent">
+                Mutfak Admin Paneli
+              </span>
+            </h1>
+
+            <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto leading-relaxed font-body">
+              Tariflerinizi ve kategorilerinizi kolayca yönetin, lezzetli içerikler oluşturun
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-6">
+              <div className="flex items-center gap-3 text-primary-100">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="font-accent font-medium text-primary-200">Toplam Tarif</p>
+                  <p className="font-bold text-2xl font-display">{recipes.length}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-primary-100">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Package className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="font-accent font-medium text-primary-200">Kategori</p>
+                  <p className="font-bold text-2xl font-display">{categories.length}</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </motion.section>
 
       {/* Success Message */}
-      {successMessage && (
-        <div className="container-custom mt-4">
-          <div className="alert alert-success">
-            ✓ {successMessage}
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-24 right-6 z-50"
+          >
+            <Card className="bg-primary-50 border-primary-200 shadow-luxury">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+                  <Star className="w-4 h-4 text-white" />
+                </div>
+                <p className="font-accent font-medium text-primary-800">{successMessage}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="container-custom py-12">
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 bg-white rounded-xl shadow-lg p-1">
-          <button
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex flex-col md:flex-row gap-4 mb-8"
+        >
+          <Button
             onClick={() => setActiveTab('recipes')}
-            className={`flex-1 px-6 py-4 font-bold rounded-lg transition-all duration-300 ${
-              activeTab === 'recipes'
-                ? 'text-white shadow-lg'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-            style={{
-              background: activeTab === 'recipes' ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)' : 'transparent'
-            }}
+            size="lg"
+            className={`flex-1 justify-center bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-luxury`}
           >
-            📖 Tarifler
-          </button>
-          <button
+            <BookOpen className="w-5 h-5 mr-2" />
+            Tarifler ({recipes.length})
+          </Button>
+          <Button
             onClick={() => setActiveTab('categories')}
-            className={`flex-1 px-6 py-4 font-bold rounded-lg transition-all duration-300 ${
-              activeTab === 'categories'
-                ? 'text-white shadow-lg'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-            style={{
-              background: activeTab === 'categories' ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)' : 'transparent'
-            }}
+            size="lg"
+            className={`flex-1 justify-center bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-luxury`}
           >
-            🏷️ Kategoriler
-          </button>
-        </div>
+            <Package className="w-5 h-5 mr-2" />
+            Kategoriler ({categories.length})
+          </Button>
+        </motion.div>
 
-      {/* Recipes Tab */}
-      {activeTab === 'recipes' && (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Recipe Form */}
-          <div className="lg:col-span-2">
-            <div className="card sticky top-24">
-              <div className="card-header">
-                <h2 className="card-title">
-                  {editingRecipeId ? '✏️ Tarifi Düzenle' : '➕ Yeni Tarif'}
-                </h2>
-              </div>
-              <form onSubmit={handleRecipeSubmit} className="space-y-5">
-                <div>
-                  <label className="form-label">
-                    Tarif Adı *
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={recipeForm.title}
-                    onChange={handleRecipeChange}
-                    className="form-input"
-                    placeholder="Tarif adını girin"
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">
-                    Açıklama
-                  </label>
-                  <textarea
-                    name="description"
-                    value={recipeForm.description}
-                    onChange={handleRecipeChange}
-                    className="form-textarea"
-                    placeholder="Tarif açıklaması"
-                    rows="3"
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">
-                    YouTube URL *
-                  </label>
-                  <input
-                    type="text"
-                    name="youtubeUrl"
-                    value={recipeForm.youtubeUrl}
-                    onChange={handleRecipeChange}
-                    className="form-input"
-                    placeholder="https://youtube.com/watch?v=..."
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">
-                    Kategori *
-                  </label>
-                  <select
-                    name="categoryId"
-                    value={recipeForm.categoryId}
-                    onChange={handleRecipeChange}
-                    className="form-select"
-                  >
-                    <option value="">Kategori seçin</option>
-                    {categories.map(cat => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="form-label">
-                    Malzemeleri (Ayrı Ayrı Girin) *
-                  </label>
-                  <div className="space-y-3 max-h-64 overflow-y-auto border border-green-200 rounded-lg p-4 bg-green-50">
-                    {recipeForm.ingredients.map((ingredient, index) => (
-                      <div key={index} className="grid grid-cols-2 gap-3 items-center bg-white p-3 rounded-lg border border-green-100">
-                        <div className="col-span-1">
-                          <input
-                            type="text"
-                            value={ingredient.amount}
-                            onChange={(e) => handleIngredientChange(index, 'amount', e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-green-300 rounded-lg focus:outline-none focus:border-green-600 bg-white"
-                            placeholder="Miktar (örn: 125 g)"
-                          />
-                        </div>
-                        <div className="col-span-1 flex gap-2">
-                          <input
-                            type="text"
-                            value={ingredient.name}
-                            onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                            className="flex-1 px-4 py-3 border-2 border-green-300 rounded-lg focus:outline-none focus:border-green-600 bg-white"
-                            placeholder="Malzeme (örn: margarin)"
-                          />
-                          {recipeForm.ingredients.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const newIngredients = recipeForm.ingredients.filter((_, i) => i !== index);
-                                setRecipeForm(prev => ({
-                                  ...prev,
-                                  ingredients: newIngredients.length > 0 ? newIngredients : [{ name: '', amount: '' }]
-                                }));
-                              }}
-                              className="px-3 py-3 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition font-bold text-base"
-                            >
-                              ✕
-                            </button>
-                          )}
-                        </div>
+        {/* Recipes Tab */}
+        <AnimatePresence mode="wait">
+          {activeTab === 'recipes' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="grid grid-cols-1 xl:grid-cols-3 gap-8"
+            >
+              {/* Recipe Form */}
+              <div className="xl:col-span-1">
+                <Card className="sticky top-24 shadow-luxury border-luxury-200 bg-gradient-to-br from-white to-luxury-50">
+                  <CardHeader className="border-luxury-200">
+                    <CardTitle className="flex items-center gap-3 font-display text-xl">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center shadow-soft">
+                        <Plus className="w-4 h-4 text-white" />
                       </div>
-                    ))}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRecipeForm(prev => ({
-                        ...prev,
-                        ingredients: [...prev.ingredients, { name: '', amount: '' }]
-                      }));
-                    }}
-                    className="mt-3 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-bold text-base w-full"
-                  >
-                    + Malzeme Ekle
-                  </button>
-                </div>
+                      {editingRecipeId ? 'Tarifi Düzenle' : 'Yeni Tarif Ekle'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <form onSubmit={handleRecipeSubmit} className="space-y-6">
+                      <div>
+                        <label className="block text-sm font-accent font-semibold text-secondary-700 mb-2">
+                          Tarif Adı *
+                        </label>
+                        <Input
+                          type="text"
+                          name="title"
+                          value={recipeForm.title}
+                          onChange={handleRecipeChange}
+                          placeholder="Lezzetli tarifinizin adı..."
+                          className="font-body"
+                          required
+                        />
+                      </div>
 
-                <div>
-                  <label className="form-label">
-                    Yapılış Adımları (Satır satır) *
-                  </label>
-                  <textarea
-                    name="instructions"
-                    value={recipeForm.instructions}
-                    onChange={handleRecipeChange}
-                    className="form-textarea"
-                    placeholder={`1. İlk adım buraya
-2. İkinci adım buraya
-3. Üçüncü adım buraya`}
-                    rows="6"
-                  />
-                  <p className="text-xs text-gray-600 mt-2">Not: Numaralar otomatik olarak kaldırılır</p>
-                </div>
+                      <div>
+                        <label className="block text-sm font-accent font-semibold text-secondary-700 mb-2">
+                          Açıklama
+                        </label>
+                        <Textarea
+                          name="description"
+                          value={recipeForm.description}
+                          onChange={handleRecipeChange}
+                          placeholder="Tarifiniz hakkında kısa bir açıklama..."
+                          rows="3"
+                          className="font-body resize-none"
+                        />
+                      </div>
 
-                <button
-                  type="submit"
-                  className="btn-primary w-full text-lg"
-                >
-                  {editingRecipeId ? '💾 Güncelle' : '✨ Oluştur'}
-                </button>
+                      <div>
+                        <label className="block text-sm font-accent font-semibold text-secondary-700 mb-2">
+                          YouTube URL *
+                        </label>
+                        <Input
+                          type="text"
+                          name="youtubeUrl"
+                          value={recipeForm.youtubeUrl}
+                          onChange={handleRecipeChange}
+                          placeholder="https://youtube.com/watch?v=..."
+                          className="font-body"
+                          required
+                        />
+                      </div>
 
-                {editingRecipeId && (
-                  <button
-                    type="button"
-                    onClick={resetRecipeForm}
-                    className="btn-secondary w-full text-lg"
-                  >
-                    ✕ İptal Et
-                  </button>
-                )}
-              </form>
-            </div>
-          </div>
+                      <div>
+                        <label className="block text-sm font-accent font-semibold text-secondary-700 mb-2">
+                          Kategori *
+                        </label>
+                        <select
+                          name="categoryId"
+                          value={recipeForm.categoryId}
+                          onChange={handleRecipeChange}
+                          className="w-full h-12 px-4 py-3 border-2 border-primary-200 rounded-xl bg-white text-secondary-900 font-medium focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 font-body"
+                          required
+                        >
+                          <option value="">Kategori seçin</option>
+                          {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
-          {/* Recipes List */}
-          <div className="lg:col-span-2">
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">📋 Tarifler ({recipes.length})</h2>
+                      <div>
+                        <label className="block text-sm font-accent font-semibold text-secondary-700 mb-2">
+                          Malzemeler *
+                        </label>
+                        <div className="space-y-3 max-h-64 overflow-y-auto custom-scrollbar border border-luxury-200 rounded-xl p-4 bg-luxury-50">
+                          {recipeForm.ingredients.map((ingredient, index) => (
+                            <div key={index} className="grid grid-cols-1 gap-3 p-3 bg-white rounded-lg border border-luxury-100">
+                              <Input
+                                type="text"
+                                value={ingredient.amount}
+                                onChange={(e) => handleIngredientChange(index, 'amount', e.target.value)}
+                                placeholder="Miktar (örn: 125 g)"
+                                className="font-body text-sm"
+                              />
+                              <div className="flex gap-2">
+                                <Input
+                                  type="text"
+                                  value={ingredient.name}
+                                  onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
+                                  placeholder="Malzeme adı"
+                                  className="flex-1 font-body text-sm"
+                                />
+                                {recipeForm.ingredients.length > 1 && (
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => removeIngredient(index)}
+                                    className="px-3"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={addIngredient}
+                          className="w-full mt-3 border-luxury-300 text-luxury-700 hover:bg-luxury-100"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Malzeme Ekle
+                        </Button>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-accent font-semibold text-secondary-700 mb-2">
+                          Yapılış Adımları *
+                        </label>
+                        <Textarea
+                          name="instructions"
+                          value={recipeForm.instructions}
+                          onChange={handleRecipeChange}
+                          placeholder={`1. İlk adım buraya&#10;2. İkinci adım buraya&#10;3. Üçüncü adım buraya`}
+                          rows="6"
+                          className="font-body resize-none"
+                          required
+                        />
+                        <p className="text-xs text-secondary-500 mt-2 font-accent">
+                          Not: Numaralar otomatik olarak düzenlenecektir
+                        </p>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <Button
+                          type="submit"
+                          size="lg"
+                          className="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-luxury hover:shadow-luxury-strong"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          {editingRecipeId ? 'Güncelle' : 'Oluştur'}
+                        </Button>
+                        {editingRecipeId && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={resetRecipeForm}
+                            className="border-luxury-300 text-luxury-700 hover:bg-luxury-100"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
               </div>
-              {loading ? (
-                <div className="p-8 text-center">
-                  <span className="animate-spin text-5xl">🍳</span>
-                </div>
-              ) : recipes.length === 0 ? (
-                <div className="alert alert-info">
-                  Henüz tarif eklenmemiştir. Yukarıdaki form ile yeni tarif ekleyebilirsiniz.
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="table-professional">
-                    <thead>
-                      <tr>
-                        <th>📖 Adı</th>
-                        <th>🏷️ Kategori</th>
-                        <th>⚙️ İşlemler</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recipes.map(recipe => (
-                        <tr key={recipe.id}>
-                          <td className="font-semibold">{recipe.title}</td>
-                          <td>
-                            <span className="badge badge-primary">{recipe.category?.name}</span>
-                          </td>
-                          <td>
-                            <button
-                              onClick={() => {
-                                setRecipeForm({
-                                  title: recipe.title,
-                                  description: recipe.description,
-                                  instructions: recipe.instructions,
-                                  youtubeUrl: recipe.youtubeUrl,
-                                  categoryId: recipe.categoryId,
-                                  ingredients: recipe.ingredients
-                                });
-                                setEditingRecipeId(recipe.id);
-                              }}
-                              className="text-primary hover:text-secondary font-bold mr-4"
-                            >
-                              ✏️ Düzenle
-                            </button>
-                            <button
-                              onClick={() => handleDeleteRecipe(recipe.id)}
-                              className="text-red-600 hover:text-red-800 font-bold"
-                            >
-                              🗑️ Sil
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Categories Tab */}
-      {activeTab === 'categories' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Category Form */}
-          <div className="lg:col-span-1">
-            <div className="card sticky top-24">
-              <div className="card-header">
-                <h2 className="card-title">
-                  {editingCategoryId ? '✏️ Kategoriyi Düzenle' : '➕ Yeni Kategori'}
-                </h2>
+              {/* Recipes List */}
+              <div className="xl:col-span-2">
+                <Card className="shadow-luxury border-luxury-200 bg-gradient-to-br from-white to-luxury-50">
+                  <CardHeader className="border-luxury-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <CardTitle className="flex items-center gap-3 font-display text-xl">
+                        <div className="w-8 h-8 bg-gradient-to-br from-accent-500 to-accent-700 rounded-lg flex items-center justify-center shadow-soft">
+                          <BookOpen className="w-4 h-4 text-white" />
+                        </div>
+                        Tarifler
+                      </CardTitle>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-secondary-400" />
+                        <Input
+                          type="text"
+                          placeholder="Tarif ara..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10 font-body text-sm"
+                        />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    {loading ? (
+                      <div className="flex justify-center py-12">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                          className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-luxury"
+                        >
+                          <ChefHat className="w-6 h-6 text-white" />
+                        </motion.div>
+                      </div>
+                    ) : filteredRecipes.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="w-20 h-20 bg-luxury-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <BookOpen className="w-10 h-10 text-luxury-400" />
+                        </div>
+                        <h3 className="text-xl font-bold font-display text-luxury-800 mb-2">
+                          {searchQuery ? 'Tarif Bulunamadı' : 'Henüz Tarif Yok'}
+                        </h3>
+                        <p className="text-luxury-600 mb-6 font-body">
+                          {searchQuery ? 'Arama kriterlerinize uygun tarif bulunamadı.' : 'İlk tarifizi oluşturmak için yukarıdaki formu kullanın.'}
+                        </p>
+                        {searchQuery && (
+                          <Button
+                            variant="outline"
+                            onClick={() => setSearchQuery('')}
+                            className="border-luxury-300 text-luxury-700 hover:bg-luxury-100"
+                          >
+                            <X className="w-4 h-4 mr-2" />
+                            Aramayı Temizle
+                          </Button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-luxury-200">
+                              <th className="text-left py-4 px-4 font-accent font-semibold text-luxury-700">Tarif</th>
+                              <th className="text-left py-4 px-4 font-accent font-semibold text-luxury-700">Kategori</th>
+                              <th className="text-right py-4 px-4 font-accent font-semibold text-luxury-700">İşlemler</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredRecipes.map((recipe, index) => (
+                              <motion.tr
+                                key={recipe.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.4, delay: index * 0.1 }}
+                                className="border-b border-luxury-100 hover:bg-luxury-50 transition-colors"
+                              >
+                                <td className="py-4 px-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
+                                      <ChefHat className="w-5 h-5 text-primary-600" />
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold font-body text-secondary-800">{recipe.title}</p>
+                                      {recipe.description && (
+                                        <p className="text-sm text-secondary-600 font-accent line-clamp-1">
+                                          {recipe.description}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="py-4 px-4">
+                                  <Badge variant="secondary" className="bg-luxury-100 text-luxury-800 border-luxury-300">
+                                    {recipe.category?.name}
+                                  </Badge>
+                                </td>
+                                <td className="py-4 px-4">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setRecipeForm({
+                                          title: recipe.title,
+                                          description: recipe.description,
+                                          instructions: recipe.instructions,
+                                          youtubeUrl: recipe.youtubeUrl,
+                                          categoryId: recipe.categoryId,
+                                          ingredients: recipe.ingredients
+                                        });
+                                        setEditingRecipeId(recipe.id);
+                                      }}
+                                      className="border-primary-300 text-primary-700 hover:bg-primary-50"
+                                    >
+                                      <Edit2 className="w-4 h-4" />
+                                    </Button>
+                                    {/* silme simgesi beyaz olacak */}
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => handleDeleteRecipe(recipe.id)}
+                                      className="border-primary-300 text-primary-700 hover:bg-primary-50"
+                                    >
+                                      <Trash2 className="w-4 h-4 text-white" />
+                                    </Button>
+                                  </div>
+                                </td>
+                              </motion.tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
-              <form onSubmit={handleCategorySubmit} className="space-y-5">
-                <div>
-                  <label className="form-label">
-                    Kategori Adı *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={categoryForm.name}
-                    onChange={handleCategoryChange}
-                    className="form-input"
-                    placeholder="Kategori adı"
-                  />
-                </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-                <div>
-                  <label className="form-label">
-                    Açıklama
-                  </label>
-                  <textarea
-                    name="description"
-                    value={categoryForm.description}
-                    onChange={handleCategoryChange}
-                    className="form-textarea"
-                    placeholder="Kategori açıklaması"
-                    rows="3"
-                  />
-                </div>
+        {/* Categories Tab */}
+        <AnimatePresence mode="wait">
+          {activeTab === 'categories' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="grid grid-cols-1 xl:grid-cols-3 gap-8"
+            >
+              {/* Category Form */}
+              <div className="xl:col-span-1">
+                <Card className="sticky top-24 shadow-luxury border-luxury-200 bg-gradient-to-br from-white to-luxury-50">
+                  <CardHeader className="border-luxury-200">
+                    <CardTitle className="flex items-center gap-3 font-display text-xl">
+                      <div className="w-8 h-8 bg-gradient-to-br from-luxury-500 to-luxury-700 rounded-lg flex items-center justify-center shadow-soft">
+                        <Plus className="w-4 h-4 text-white" />
+                      </div>
+                      {editingCategoryId ? 'Kategoriyi Düzenle' : 'Yeni Kategori'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <form onSubmit={handleCategorySubmit} className="space-y-6">
+                      <div>
+                        <label className="block text-sm font-accent font-semibold text-secondary-700 mb-2">
+                          Kategori Adı *
+                        </label>
+                        <Input
+                          type="text"
+                          name="name"
+                          value={categoryForm.name}
+                          onChange={handleCategoryChange}
+                          placeholder="Kategori adı"
+                          className="font-body"
+                          required
+                        />
+                      </div>
 
-                <button
-                  type="submit"
-                  className="btn-primary w-full text-lg"
-                >
-                  {editingCategoryId ? '💾 Güncelle' : '✨ Oluştur'}
-                </button>
+                      <div>
+                        <label className="block text-sm font-accent font-semibold text-secondary-700 mb-2">
+                          Açıklama
+                        </label>
+                        <Textarea
+                          name="description"
+                          value={categoryForm.description}
+                          onChange={handleCategoryChange}
+                          placeholder="Kategori açıklaması"
+                          rows="3"
+                          className="font-body resize-none"
+                        />
+                      </div>
 
-                {editingCategoryId && (
-                  <button
-                    type="button"
-                    onClick={resetCategoryForm}
-                    className="btn-secondary w-full text-lg"
-                  >
-                    ✕ İptal Et
-                  </button>
-                )}
-              </form>
-            </div>
-          </div>
-
-          {/* Categories List */}
-          <div className="lg:col-span-2">
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">🏷️ Kategoriler ({categories.length})</h2>
+                      <div className="flex gap-3">
+                        <Button
+                          type="submit"
+                          size="lg"
+                          className="flex-1 bg-gradient-to-r from-luxury-600 to-luxury-700 text-white shadow-luxury hover:shadow-luxury-strong"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          {editingCategoryId ? 'Güncelle' : 'Oluştur'}
+                        </Button>
+                        {editingCategoryId && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={resetCategoryForm}
+                            className="border-luxury-300 text-luxury-700 hover:bg-luxury-100"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
               </div>
-              {categories.length === 0 ? (
-                <div className="alert alert-info">
-                  Henüz kategori eklenmemiştir. Yukarıdaki form ile yeni kategori ekleyebilirsiniz.
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="table-professional">
-                    <thead>
-                      <tr>
-                        <th>🏷️ Adı</th>
-                        <th>📖 Tarif Sayısı</th>
-                        <th>⚙️ İşlemler</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {categories.map(category => (
-                        <tr key={category.id}>
-                          <td className="font-semibold">{category.name}</td>
-                          <td>
-                            <span className="badge badge-secondary">
-                              {category.recipes?.length || 0} tarif
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              onClick={() => {
-                                setCategoryForm({
-                                  name: category.name,
-                                  description: category.description
-                                });
-                                setEditingCategoryId(category.id);
-                              }}
-                              className="text-primary hover:text-secondary font-bold mr-4"
-                            >
-                              ✏️ Düzenle
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCategory(category.id)}
-                              className="text-red-600 hover:text-red-800 font-bold"
-                            >
-                              🗑️ Sil
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+
+              {/* Categories List */}
+              <div className="xl:col-span-2">
+                <Card className="shadow-luxury border-luxury-200 bg-gradient-to-br from-white to-luxury-50">
+                  <CardHeader className="border-luxury-200">
+                    <CardTitle className="flex items-center gap-3 font-display text-xl">
+                      <div className="w-8 h-8 bg-gradient-to-br from-luxury-500 to-luxury-700 rounded-lg flex items-center justify-center shadow-soft">
+                        <Package className="w-4 h-4 text-white" />
+                      </div>
+                      Kategoriler
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    {categories.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="w-20 h-20 bg-luxury-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <Package className="w-10 h-10 text-luxury-400" />
+                        </div>
+                        <h3 className="text-xl font-bold font-display text-luxury-800 mb-2">
+                          Henüz Kategori Yok
+                        </h3>
+                        <p className="text-luxury-600 mb-6 font-body">
+                          İlk kategorinizi oluşturmak için yukarıdaki formu kullanın.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {categories.map((category, index) => (
+                          <motion.div
+                            key={category.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: index * 0.1 }}
+                            className="p-4 bg-white rounded-xl border border-luxury-200 hover:border-luxury-300 hover:shadow-soft transition-all duration-300"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-bold font-display text-luxury-800 mb-2">
+                                  {category.name}
+                                </h4>
+                                {category.description && (
+                                  <p className="text-sm text-luxury-600 font-accent mb-3 line-clamp-2">
+                                    {category.description}
+                                  </p>
+                                )}
+                                <Badge variant="secondary" className="bg-luxury-100 text-luxury-800 border-luxury-300">
+                                  {category.recipes?.length || 0} tarif
+                                </Badge>
+                              </div>
+                              <div className="flex gap-2 ml-4">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setCategoryForm({
+                                      name: category.name,
+                                      description: category.description
+                                    });
+                                    setEditingCategoryId(category.id);
+                                  }}
+                                  className="border-luxury-300 text-luxury-700 hover:bg-luxury-100"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => handleDeleteCategory(category.id)}
+                                  className="bg-accent-100 text-accent-700 hover:bg-accent-200 border-accent-300"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
-  </div>
   );
 }
